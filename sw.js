@@ -1,7 +1,7 @@
 /* Minimal offline cache for the Field Guide.
    Network-first for the page itself (so updates arrive immediately when
    online), falling back to the cached copy when offline. */
-var CACHE = "sjotl-fieldguide-v1";
+var CACHE = "sjotl-fieldguide-v2";
 var ASSETS = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", function (e) {
