@@ -321,6 +321,58 @@
     @keyframes riteFill { to { fill-opacity: 1; } }
   }
 
+  /* ---------- Install note (shown once, device-aware, dismissible) ---------- */
+  .install-note {
+    max-width: 30rem;
+    margin: 0 auto clamp(2rem, 5vw, 2.8rem);
+    padding: 1.05rem 1.3rem 1.05rem;
+    background: oklch(0.9645 0.0261 90.10 / 0.55);
+    border: 1px solid oklch(0.4760 0.0930 79.00 / 0.5);
+    text-align: center;
+  }
+  .install-note .in-head {
+    font-family: var(--font-caps);
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+    margin: 0 0 0.5rem;
+  }
+  .install-note .in-body {
+    font-size: 1rem;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    margin: 0 0 0.6rem;
+    text-wrap: pretty;
+  }
+  .install-note .in-body strong { font-weight: 600; color: var(--ink); }
+  .share-glyph {
+    display: inline-block;
+    width: 0.85em; height: 1.05em;
+    vertical-align: -0.14em;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .in-dismiss {
+    font: inherit;
+    font-size: 0.82rem;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+    background: none;
+    border: none;
+    border-bottom: 1px dotted var(--ink-soft);
+    cursor: pointer;
+    padding: 0;
+    opacity: 0.7;
+  }
+  .in-dismiss:hover { color: var(--crimson); border-color: var(--crimson); opacity: 1; }
+  body[data-view="section"] .install-note { display: none; }
+  @media print { .install-note { display: none !important; } }
+
   /* ---------- Festal vesting (Nativity / Pascha, set by date) ---------- */
   .festal {
     font-family: var(--font-caps);
@@ -2914,6 +2966,12 @@ c33 -17 75 -28 117 -33 37 -3 78 -12 92 -20 14 -8 58 -16 99 -19 82 -7 82 -7
     <p class="epigraph">“Come and see.” <span class="cite">— John 1:39</span></p>
     <p class="festal" id="festalLine" hidden></p>
   </header>
+
+  <aside class="install-note" id="installNote" hidden>
+    <p class="in-head">Keep this Guide with you</p>
+    <p class="in-body" id="installBody"></p>
+    <button class="in-dismiss" id="installDismiss" type="button">Dismiss</button>
+  </aside>
 
   <nav class="contents" aria-label="Contents">
     <h2>Contents</h2>
@@ -11003,6 +11061,47 @@ l176 -2 21 33 c17 28 21 50 21 122 0 78 -2 87 -20 92 -10 3 -22 14 -25 24 -11
       updateLadders(false);
     });
   }
+
+  /* ----- install note: device-aware Add to Home Screen guidance ----- */
+  (function installNote() {
+    var note = document.getElementById("installNote");
+    if (!note) return;
+    var KEY = "sjotl-fieldguide-install-dismissed";
+    var standalone =
+      (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) ||
+      window.navigator.standalone === true;
+    var hosted = location.protocol.indexOf("http") === 0;
+    var dismissed = false;
+    try { dismissed = !!localStorage.getItem(KEY); } catch (e) {}
+    if (!hosted || standalone || dismissed) return;
+
+    var SHARE = '<svg class="share-glyph" viewBox="0 0 16 20" aria-hidden="true">' +
+      '<path d="M3 8 h10 v9 h-10 z M8 1 v9 M8 1 l-3 3 M8 1 l3 3" /></svg>';
+    var ua = navigator.userAgent;
+    var isIOS = /iPhone|iPad|iPod/.test(ua) ||
+      (/Macintosh/.test(ua) && "ontouchend" in document);
+    var isAndroid = /Android/.test(ua);
+    var bodyEl = document.getElementById("installBody");
+    if (isIOS) {
+      bodyEl.innerHTML = "Tap the <strong>Share</strong> button " + SHARE +
+        " below, then choose <strong>Add to Home Screen</strong>. " +
+        "The Guide will open like an app, work without a connection, and keep your place on the ladder.";
+    } else if (isAndroid) {
+      bodyEl.innerHTML = "Tap the <strong>&#8942; menu</strong> at the top of your browser, then choose " +
+        "<strong>Add to Home screen</strong> (on some phones, <strong>Install app</strong>). " +
+        "The Guide will open like an app, work without a connection, and keep your place on the ladder.";
+    } else {
+      bodyEl.innerHTML = "Open this page on your phone and add it to your home screen &mdash; " +
+        "on iPhone: <strong>Share " + SHARE + " &rarr; Add to Home Screen</strong>; " +
+        "on Android: <strong>&#8942; &rarr; Add to Home screen</strong>. " +
+        "It will open like an app and keep your place on the ladder.";
+    }
+    note.hidden = false;
+    document.getElementById("installDismiss").addEventListener("click", function () {
+      note.hidden = true;
+      try { localStorage.setItem(KEY, "1"); } catch (e) {}
+    });
+  })();
 
   /* ----- festal vesting: Nativity and Bright Week, by the visitor's date ----- */
   function orthodoxPascha(y) {
