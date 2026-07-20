@@ -1,0 +1,15 @@
+{
+  "name": "Field Guide for Inquirers & Catechumens",
+  "short_name": "Field Guide",
+  "description": "St. John of the Ladder Orthodox Church — the path of inquiry, catechumenate, and reception, with the Metanoia checklist.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#E7DBBF",
+  "theme_color": "#7A1F2E",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
